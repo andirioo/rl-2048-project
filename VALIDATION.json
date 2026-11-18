@@ -1,0 +1,49 @@
+{
+  "purpose": "Smoke/integration validation only; not an algorithm performance benchmark",
+  "unit_tests_passed": 19,
+  "checked_evaluations": {
+    "dqn": {
+      "completed_episodes": 100,
+      "csv_verified": true
+    },
+    "reinforce": {
+      "completed_episodes": 100,
+      "csv_verified": true
+    },
+    "student": {
+      "completed_episodes": 100,
+      "csv_verified": true
+    },
+    "random": {
+      "completed_episodes": 100,
+      "csv_verified": true
+    },
+    "greedy": {
+      "completed_episodes": 100,
+      "csv_verified": true
+    }
+  },
+  "truncation_cli_exit_code_verified": 2,
+  "statistics_checked_independently": [
+    "mean_score",
+    "sample_std_ddof1",
+    "threshold_counts",
+    "threshold_rates"
+  ],
+  "checkpoint_roundtrip_checked": [
+    "dqn/mlp",
+    "dqn/cnn",
+    "reinforce/mlp",
+    "reinforce/cnn",
+    "student/mlp",
+    "student/cnn"
+  ],
+  "runtime": "Windows / Python 3.12 / CPU",
+  "original_ppt_modified": false,
+  "project_language": "English",
+  "language_audit": {
+    "text_files_checked": 65,
+    "cjk_text_occurrences": 0,
+    "ascii_project_filenames": true
+  }
+}

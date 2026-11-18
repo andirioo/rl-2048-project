@@ -1,0 +1,6 @@
+{
+  "algorithm": "dqn",
+  "network": "mlp",
+  "encoding": "log2",
+  "output_dir": "outputs/dqn_mlp"
+}

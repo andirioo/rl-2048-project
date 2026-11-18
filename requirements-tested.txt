@@ -1,0 +1,5 @@
+# Direct dependency versions tested on Python 3.12 / Windows CPU.
+# Install torch from the CPU index documented in README.
+numpy==2.5.4
+torch==2.14.1
+matplotlib==3.11.2

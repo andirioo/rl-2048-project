@@ -1,0 +1,6 @@
+{
+  "algorithm": "student",
+  "network": "mlp",
+  "encoding": "log2",
+  "output_dir": "outputs/student"
+}
