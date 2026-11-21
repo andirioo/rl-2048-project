@@ -1,5 +1,6 @@
 """Default DQN. STUDENT EDIT markers identify action selection, targets, and loss functions."""
 from copy import deepcopy
+import math
 import numpy as np
 import torch
 from torch.nn import functional as F
@@ -17,8 +18,12 @@ class DQNAgent(TorchAgent):
 
     def epsilon(self):
         fraction = min(self.env_steps / self.config.epsilon_decay_steps, 1.0)
-        return self.config.epsilon_start + fraction * (
-            self.config.epsilon_end - self.config.epsilon_start)
+        start, end = self.config.epsilon_start, self.config.epsilon_end
+        if self.config.epsilon_schedule == "linear":
+            return start + fraction * (end - start)
+        if self.config.epsilon_schedule == "cosine":
+            return end + 0.5 * (start - end) * (1.0 + math.cos(math.pi * fraction))
+        raise ValueError(f"Unknown epsilon schedule: {self.config.epsilon_schedule}")
 
     @torch.no_grad()
     def act(self, state, action_mask, training=False):
@@ -46,9 +51,15 @@ class DQNAgent(TorchAgent):
         """
         if torch.any((~terminated) & (~next_masks.any(dim=1))):
             raise ValueError("Nonterminal samples must have a legal next action")
-        q_next = self.target_model(next_states).masked_fill(~next_masks, -torch.inf)
-        best = q_next.max(dim=1).values
-        # Set terminal values directly to zero; 0 * -inf would produce NaN.
+        if self.config.double_dqn:
+            online_q = self.model(next_states).masked_fill(~next_masks, -torch.inf)
+            best_actions = online_q.argmax(dim=1)
+            target_q = self.target_model(next_states)
+            best = target_q.gather(1, best_actions[:, None]).squeeze(1)
+        else:
+            q_next = self.target_model(next_states).masked_fill(~next_masks, -torch.inf)
+            best = q_next.max(dim=1).values
+
         best = torch.where(terminated, torch.zeros_like(best), best)
         return rewards + self.config.gamma * best
 
