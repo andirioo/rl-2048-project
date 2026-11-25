@@ -1,0 +1,7 @@
+{
+  "algorithm": "dqn",
+  "network": "cnn",
+  "encoding": "one_hot",
+  "reward": "strategic",
+  "output_dir": "outputs/strategic_dqn"
+}

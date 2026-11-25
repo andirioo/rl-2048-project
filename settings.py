@@ -60,8 +60,8 @@ class Config:
             raise ValueError("learning_rate, grad_clip, and reward_scale must be > 0")
         if self.encoding not in {"one_hot", "log2"}:
             raise ValueError("encoding must be one_hot or log2")
-        if self.reward not in {"score", "merge_bonus"}:
-            raise ValueError("reward must be score or merge_bonus")
+        if self.reward not in {"score", "merge_bonus", "strategic"}:
+            raise ValueError("reward must be score, merge_bonus, or strategic")
         return self
 
     def to_dict(self):
