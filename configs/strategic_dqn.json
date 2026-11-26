@@ -1,7 +1,9 @@
 {
   "algorithm": "dqn",
+  "double_dqn": true,
+  "epsilon_schedule": "cosine",
   "network": "cnn",
   "encoding": "one_hot",
   "reward": "strategic",
-  "output_dir": "outputs/strategic_dqn"
+  "output_dir": "outputs/strategic_ddqn_20k"
 }
