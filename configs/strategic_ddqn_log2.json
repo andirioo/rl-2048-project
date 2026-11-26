@@ -3,7 +3,7 @@
   "double_dqn": true,
   "epsilon_schedule": "cosine",
   "network": "cnn",
-  "encoding": "log2",
+  "encoding": "one_hot",
   "reward": "strategic",
   "output_dir": "outputs/strategic_ddqn_log2_20k"
 }
