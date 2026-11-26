@@ -1,0 +1,6 @@
+{
+  "algorithm": "reinforce",
+  "network": "mlp",
+  "encoding": "log2",
+  "output_dir": "outputs/reinforce"
+}

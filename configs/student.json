@@ -1,0 +1,7 @@
+{
+  "algorithm": "student",
+  "network": "mlp",
+  "encoding": "log2",
+  "reward_scale": 0.01,
+  "output_dir": "outputs/student"
+}
