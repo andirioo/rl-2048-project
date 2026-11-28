@@ -24,8 +24,10 @@ class Config:
     epsilon_start: float = 1.0
     epsilon_end: float = 0.05
     epsilon_decay_steps: int = 20000
-    epsilon_schedule: str = "linear"
+    epsilon_schedule: str = "linear"      # linear | cosine | softmax
     double_dqn: bool = False
+    temperature_start: float = 1.0        # softmax only
+    temperature_end: float = 0.05         # softmax only
     grad_clip: float = 10.0
     total_steps: int = 20000
     checkpoint_every: int = 5000
@@ -40,8 +42,10 @@ class Config:
             raise ValueError("gamma must be in [0, 1]")
         if not 0 <= self.epsilon_end <= self.epsilon_start <= 1:
             raise ValueError("Require 0 <= epsilon_end <= epsilon_start <= 1")
-        if self.epsilon_schedule not in {"linear", "cosine"}:
-            raise ValueError("epsilon_schedule must be linear or cosine")
+        if self.epsilon_schedule not in {"linear", "cosine", "softmax"}:
+            raise ValueError("epsilon_schedule must be linear, cosine, or softmax")
+        if not 0 < self.temperature_end <= self.temperature_start:
+            raise ValueError("Require 0 < temperature_end <= temperature_start")
         if not isinstance(self.double_dqn, bool):
             raise ValueError("double_dqn must be true or false")
         positive = ("channels", "conv_depth", "hidden_units", "batch_size",

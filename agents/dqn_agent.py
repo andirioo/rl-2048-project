@@ -23,20 +23,47 @@ class DQNAgent(TorchAgent):
             return start + fraction * (end - start)
         if self.config.epsilon_schedule == "cosine":
             return end + 0.5 * (start - end) * (1.0 + math.cos(math.pi * fraction))
+        if self.config.epsilon_schedule == "softmax":
+            return 0.0  # softmax exploration never plays a uniformly random move
         raise ValueError(f"Unknown epsilon schedule: {self.config.epsilon_schedule}")
+
+    def temperature(self):
+        """Softmax temperature: geometric decay from temperature_start to temperature_end
+        over epsilon_decay_steps, then constant."""
+        fraction = min(self.env_steps / self.config.epsilon_decay_steps, 1.0)
+        start, end = self.config.temperature_start, self.config.temperature_end
+        return start * (end / start) ** fraction
 
     @torch.no_grad()
     def act(self, state, action_mask, training=False):
         # STUDENT EDIT D1: Replace exploration. Evaluation always disables epsilon exploration.
         mask = self.check_mask(action_mask)
-        if training and self.rng.random() < self.epsilon():
+        softmax = self.config.epsilon_schedule == "softmax"
+        if training and not softmax and self.rng.random() < self.epsilon():
             action = int(self.rng.choice(np.flatnonzero(mask)))
         else:
             self.model.eval()
             q = self.model(self.encode_batch([state]))[0]
+            if training and softmax:
+                return ActionResult(self.softmax_action(q, mask))
             legal = torch.as_tensor(mask, device=self.device)
             action = int(q.masked_fill(~legal, -torch.inf).argmax().item())
         return ActionResult(action)
+
+    def softmax_action(self, q, mask):
+        """Sample a legal move with probability proportional to exp(Q / temperature).
+
+        Q-values are rescaled by the gap between the best and worst legal move, so the
+        temperature does not depend on the reward scale. At temperature 1 the worst legal
+        move is e times less likely than the best; at 0.05 a clearly bad move is almost
+        never played, while moves with nearly equal Q-values are still tried.
+        """
+        legal_q = q.detach().double().cpu().numpy()[mask]
+        spread = max(float(legal_q.max() - legal_q.min()), 1e-8)
+        logits = (legal_q - legal_q.max()) / (spread * self.temperature())
+        probs = np.exp(logits)
+        probs /= probs.sum()
+        return int(np.flatnonzero(mask)[self.rng.choice(len(probs), p=probs)])
 
     def observe(self, transition):
         self.replay.push(transition)
