@@ -6,6 +6,7 @@ import numpy as np
 import torch
 from encoders import encode_state
 from models import build_model
+from settings import Config
 
 ENVIRONMENT_ID = "2048-4x4-up-left-right-down-continue-v1"
 
@@ -91,7 +92,8 @@ class TorchAgent(BaseAgent):
         payload = read_checkpoint(path)
         if payload["config"] != self.config.to_dict():
             # The device may differ; restore all other settings from the checkpoint.
-            old, new = dict(payload["config"]), self.config.to_dict()
+            # Settings added after the checkpoint was saved take their default values.
+            old, new = {**Config().to_dict(), **payload["config"]}, self.config.to_dict()
             old.pop("device", None)
             new.pop("device", None)
             if old != new:

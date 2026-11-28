@@ -12,6 +12,7 @@ from torch.distributions import Categorical
 
 from agents.base_agent import ActionResult, TorchAgent, read_checkpoint, ENVIRONMENT_ID
 from models import build_model
+from settings import Config
 
 
 class StudentAgent(TorchAgent):
@@ -123,7 +124,8 @@ class StudentAgent(TorchAgent):
 
     def load(self, path):
         payload = read_checkpoint(path)
-        old, new = dict(payload["config"]), self.config.to_dict()
+        # Settings added after the checkpoint was saved take their default values.
+        old, new = {**Config().to_dict(), **payload["config"]}, self.config.to_dict()
         old.pop("device", None)
         new.pop("device", None)
         if old != new:
